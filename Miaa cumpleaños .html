@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Cumpleaños Real de Mía</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght=300;400;600&family=Great+Vibes&family=Montserrat:wght=300&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Paleta Azul Perlado y Oro */
+            --dark-bg: #0b132b; 
+            --pearl-blue-center: #1f3c88; 
+            --pearl-glow: #2a52be; 
+            --glass-card: rgba(15, 32, 67, 0.88); 
+            --gold-elegant: #ffdf7a; /* Dorado vivo y brillante */
+            --gold-glow: #e5c158;
+            --text-light: #f4f7f6; 
+            --blue-royal: #8ec5fc; 
+        }
+
+        body { 
+            margin: 0; padding: 0; 
+            background-color: var(--dark-bg); 
+            background-image: radial-gradient(circle at 50% 50%, var(--pearl-glow) 0%, var(--pearl-blue-center) 50%, var(--dark-bg) 100%); 
+            font-family: 'Cormorant Garamond', serif; 
+            color: var(--text-light); 
+            overflow-x: hidden; 
+            min-height: 100vh; 
+            perspective: 1000px;
+        }
+
+        /* --- CIELO ESTRELLADO CORREGIDO (Fijo en el fondo de todo) --- */
+        #stars-container {
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 1; /* Al fondo absoluto para que no tape las pantallas pero sea visible en ambas */
+        }
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            animation: twinkle ease-in-out infinite;
+            opacity: 0;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.4); }
+            50% { opacity: 1; transform: scale(1.3); box-shadow: 0 0 12px var(--gold-glow), 0 0 4px #fff; }
+        }
+
+        /* Pantalla de carga semi-transparente para ver el cielo estrellado de fondo */
+        #intro-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: radial-gradient(circle at 50% 50%, rgba(28, 53, 116, 0.4) 0%, rgba(11, 19, 43, 0.7) 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            z-index: 3000; transition: opacity 1.5s ease; text-align: center; padding: 20px; 
+        }
+
+        .royal-title { font-family: 'Great Vibes', cursive; font-size: 5rem; color: var(--gold-elegant); margin: 10px 0; text-shadow: 0 0 25px rgba(255, 223, 122, 0.4); }
+        .age-text { font-family: 'Great Vibes', cursive; font-size: 4rem; color: var(--text-light); display: block; text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); }
+        #timer { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; color: var(--text-light); letter-spacing: 4px; margin: 20px 0; font-weight: 300; }
+        
+        .open-btn { background: transparent; border: 1px solid var(--gold-elegant); padding: 15px 40px; border-radius: 50px; color: var(--gold-elegant); cursor: pointer; font-family: 'Cormorant Garamond'; font-size: 1.5rem; transition: 0.4s; margin-top: 20px; text-shadow: 0 0 10px rgba(255, 223, 122, 0.2); box-shadow: inset 0 0 15px rgba(255, 223, 122, 0.1); }
+        .open-btn:hover { background: var(--gold-elegant); color: var(--dark-bg); box-shadow: 0 0 25px rgba(255, 223, 122, 0.7); font-weight: bold; }
+
+        .container { max-width: 650px; width: 90%; margin: 60px auto; padding: 0 20px; display: none; position: relative; z-index: 500; }
+        .letter-content { background: var(--glass-card); padding: 60px; border-radius: 20px; border: 1px solid rgba(255, 223, 122, 0.3); line-height: 1.8; font-size: 1.3rem; box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 30px rgba(142, 197, 252, 0.1); }
+        .letter-title { font-family: 'Great Vibes', cursive; font-size: 5rem; color: var(--gold-elegant); margin: 0 0 10px; text-align: center; text-shadow: 0 0 20px rgba(255, 223, 122, 0.3); }
+        .cute-divider { text-align: center; margin: 40px 0; color: var(--gold-elegant); font-size: 1.5rem; }
+
+        .photo-frame { border: 2px solid var(--gold-elegant); box-shadow: 0 15px 35px rgba(0,0,0,0.6); border-radius: 10px; overflow: hidden; margin: 30px auto; display: block; transition: transform 0.3s ease; }
+        .photo-frame:hover { transform: scale(1.05) rotate(0deg) !important; box-shadow: 0 20px 40px rgba(142, 197, 252, 0.4); }
+        .gallery-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 40px 0; text-align: center; }
+        
+        .gallery-photo { width: 180px; height: 180px; object-fit: cover; border-radius: 8px; display: block; margin: 0 auto; }
+
+        .falling { 
+            position: fixed; 
+            top: -50px; 
+            pointer-events: none; 
+            z-index: 9999; 
+            animation: fallExclusive linear forwards; 
+            user-select: none;
+            will-change: transform; 
+        }
+        @keyframes fallExclusive { 
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.9; }
+            90% { opacity: 0.9; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } 
+        }
+        
+        @media (max-width: 600px) { .royal-title { font-size: 3rem; } .letter-title { font-size: 3.5rem; } .letter-content { padding: 40px 20px; } .gallery-photo { width: 140px; height: 140px; } }
+    </style>
+</head>
+<body>
+
+    <div id="stars-container"></div>
+
+    <audio id="bg-music" src="https://www.dropbox.com/scl/fi/qlwlzoe2wp6c142uzqr6w/Luis-Miguel-Sabes-Una-Cosa-Video-Con-Letra-_256k.mp3?rlkey=vyytkvuyj7w93ldhzdjulz8cp&st=cui413ru&dl=1" preload="auto"></audio>
+
+    <div id="intro-overlay">
+        <div style="font-size: 60px;">✨💎💙✨</div>
+        <h1 class="royal-title">¡Feliz Cumpleaños!</h1>
+        <span class="age-text">13 añitos llenos de magia</span>
+        <div id="timer">Calculando tiempo...</div>
+        <button class="open-btn" onclick="startExperience()">Abrir tu regalo</button>
+    </div>
+
+    <div class="container" id="main">
+        <div class="letter-content">
+            <h1 class="letter-title">Para mi Mía</h1>
+
+            <p>¡Feliz cumpleaños, Mía! 🎁🎉✨</p>
+            <p>Hoy es un día súper especial porque celebras tus 13 añitos oficiales. Es increíble ver estas fotos tuyas y pensar en cómo el tiempo vuela tan rápido. Ver esa hermosa bebé que eras y contemplar a la niña tan maravillosa, simpática y linda en la que te has convertido hoy me llena de una alegría muy bonita. Aunque tiene muy poquito tiempo que nos conocemos a la distancia y todavía estamos en esa linda etapa de ir descubriendo nuestra forma de ser, quiero decirte que descubrir tu forma de ser ha sido de las sorpresas más bonitas de mi año. ¡Eres un alma súper buena onda! 🎀💗🌟</p>
+            
+            <div class="gallery-container">
+                <div style="display: inline-block;">
+                    <img src="https://www.dropbox.com/scl/fi/dbltpugpc55glxgmx50cj/IMG_20260619_233041.jpg?rlkey=55irujf1q7vn76otgavaqbpry&st=wt1g1jxp&dl=1" alt="Mía de bebé" class="photo-frame gallery-photo" style="transform: rotate(-2deg);">
+                    <p style="font-size:0.9rem; color:var(--gold-elegant); margin-top:5px;">Cuando eras peque... 👶🫧</p>
+                </div>
+                <div style="display: inline-block;">
+                    <img src="https://www.dropbox.com/scl/fi/zvkcucnfcge022hdei61o/IMG_20260619_233113.jpg?rlkey=bk9wx1qac8mcjrnoomxnsgax9&st=676b50eo&dl=1" alt="Mía actual" class="photo-frame gallery-photo" style="transform: rotate(2deg);">
+                    <p style="font-size:0.9rem; color:var(--gold-elegant); margin-top:5px;">¡Oficialmente 13! 👑❄️</p>
+                </div>
+            </div>
+
+            <p>Me encanta que, a pesar de que no nos conocemos en persona, sigamos platicando y conectados todos los días. Tal vez no nos pasamos las horas enteras escribiendo en el chat, ¡pero hablamos lo suficiente como para alegrar el día, saber cómo estamos y sacarme una muy buena sonrisa! Jajaja. Valoro muchísimo que mantengamos este contacto constante y aprecio la confianza que, paso a pasito, se va construyendo entre los dos. 🥰💞🪅</p>
+            <div class='cute-divider'>👑 ⭐ ❄️ ✨ 🔮</div>
+            <p style='color: var(--blue-royal); font-style: italic; text-align: center; text-shadow: 0 0 10px rgba(142,197,252,0.5);'>✨ Que tu camino siempre esté lleno de luz y cosas hermosas 💗✨</p>
+            <p>Para esta nueva etapa de la adolescencia que empiezas hoy, te deseo todo lo más lindo y maravilloso de este mundo. Te mereces que te pasen cosas espectaculares, que alcances cada meta que pase por tu mente y que todo lo que hagas te salga súper bien. Espero de todo corazón que en tu vida no existan los momentos tristes, pero si alguna vez llegan a aparecer los días nublados, quiero pedirte un favor: confía plenamente en mí. ⭐💘💞</p>
+            
+            <p>Siempre vas a poder contar conmigo para platicar, desahogarte de lo que sea o pedir un consejo. Aquí voy a estar listo para escucharte, apoyarte y guiarte con todo mi cariño como tu amigo. 🌸🎀💖</p>
+            <p>Sé que a veces la gente se puede sorprender un poquito por la diferencia de edad que nos llevamos, jajaja, ¡pero las amistades verdaderas y las buenas conexiones no entienden de números! Yo espero que nuestra amistad siga creciendo día con día, volviéndose cada vez más fuerte, leal y bonita conforme nos vayamos conociendo más y más, sin importar lo que digan las edades de los dos. 🙂‍↕️❤️✨</p>
+            <p>Disfruta muchísimo tu día, déjate consentir un montón por toda tu familia y nunca olvides la personita tan valiosa, brillante y mágica que eres. ¡Muchas felicidades por tus 13 añitos, mi niña! 💘🎁🥰</p>
+            
+            <p style="margin-top: 60px; text-align: center;">Con todo mi cariño y apoyo como tu amigo, ❤️<br>Ilyass ✨💖</p>
+        </div>
+    </div>
+
+    <script>
+        // Generador de estrellas en el fondo infinito
+        function generateStars() {
+            const container = document.getElementById('stars-container');
+            const starCount = 120; // Más cantidad para que cubra la pantalla completa con un look increíble
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh'; // Fijo en el viewport
+                
+                const size = Math.random() * 3.5 + 1.5; 
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                
+                star.style.animationDuration = (Math.random() * 3 + 2.5) + 's';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                
+                // Dorado predominante más encendido e intenso
+                star.style.backgroundColor = Math.random() > 0.25 ? '#ffdf7a' : '#fff';
+                container.appendChild(star);
+            }
+        }
+
+        // Se ejecuta inmediatamente para que decore tanto la intro como la carta principal
+        generateStars();
+
+        function startExperience() {
+            const music = document.getElementById('bg-music');
+            try {
+                music.currentTime = 10;
+                let playPromise = music.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Audio restringido."); });
+                }
+            } catch(e) { console.log("Error de audio:", e); }
+
+            document.getElementById('intro-overlay').style.opacity = '0';
+            setTimeout(() => { 
+                document.getElementById('intro-overlay').style.display = 'none'; 
+                document.getElementById('main').style.display = 'block'; 
+            }, 1000);
+        }
+
+        function createFallingItem() {
+            const items = ['💗', '💕', '💖', '💘', '❤️', '🥰', '🙂‍↕️', '💞', '⭐', '❄️', '✨', '🪅', '🎉', '🎀', '🎁', '👑', '🫧'];
+            const drop = document.createElement('div');
+            drop.className = 'falling';
+            drop.innerText = items[Math.floor(Math.random() * items.length)];
+            drop.style.left = Math.random() * 95 + 'vw';
+            drop.style.fontSize = (Math.random() * 20 + 18) + 'px';
+            drop.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            document.body.appendChild(drop);
+            setTimeout(() => { drop.remove(); }, 11000);
+        }
+        setInterval(createFallingItem, 400);
+
+        // --- RECONOCIMIENTO HORARIO ---
+        function updateCountdown() {
+            const now = new Date();
+            const targetTimeZone = 'America/Mexico_City'; // Cámbialo si se encuentra en otra zona
+            
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: targetTimeZone,
+                year: 'numeric', month: 'numeric', day: 'numeric',
+                hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false
+            });
+            
+            const parts = formatter.formatToParts(now);
+            const tzDate = {};
+            parts.forEach(p => tzDate[p.type] = parseInt(p.value));
+            
+            const currentInTarget = new Date(tzDate.year, tzDate.month - 1, tzDate.day, tzDate.hour, tzDate.minute, tzDate.second);
+            const targetDate = new Date(2026, 5, 20, 0, 0, 0); 
+            
+            const diff = targetDate - currentInTarget;
+
+            if (diff > 0) {
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById('timer').innerText = `Faltan: ${d}d ${h}h ${m}m ${s}s`;
+            } else {
+                document.getElementById('timer').innerText = "¡YA ES TU DÍA! 🎂🎉";
+            }
+        }
+        
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
